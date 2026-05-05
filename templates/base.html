@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}LITReview{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header>
+        <div class="brand">LITReview</div>
+        {% if user.is_authenticated %}
+        <nav aria-label="Navigation principale" style="margin-top: 1rem;">
+            <a href="{% url 'home' %}" style="margin-right: 1rem; color: black; text-decoration: none;">Accueil</a>
+            <form method="post" action="{% url 'logout' %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" style="border:none; background:none; color:black; text-decoration:underline; font-size:1rem; cursor:pointer;">Se déconnecter</button>
+            </form>
+        </nav>
+        {% endif %}
+    </header>
+
+    <main id="main-content">
+        {% block content %}
+        {% endblock %}
+    </main>
+</body>
+</html>

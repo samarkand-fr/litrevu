@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Inscription - LITReview{% endblock %}
+{% block page_label %}Formulaire d'inscription{% endblock %}
+
+{% block content %}
+<div class="signup-form-container">
+    <h2>Inscrivez-vous</h2>
+    
+    <form method="post" action="{% url 'signup' %}">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div class="errorlist">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}" class="visually-hidden">{{ field.label }}</label>
+                <input type="{{ field.field.widget.input_type }}" name="{{ field.html_name }}" id="{{ field.id_for_label }}" class="form-control" placeholder="{% if field.name == 'username' %}Nom d'utilisateur{% elif field.name == 'password' or field.name == 'password_1' or field.name == 'password_2' %}Mot de passe{% elif 'confirm' in field.label|lower or 'confirmation' in field.label|lower %}Confirmer mod de passe{% else %}{{ field.label }}{% endif %}" required aria-required="true">
+                {{ field.errors }}
+            </div>
+        {% endfor %}
+
+        <div class="signup-form-actions">
+            <a href="{% url 'login' %}" class="btn" aria-label="Retourner à la page de connexion">Retourner</a>
+            <button type="submit" class="btn" aria-label="Créer votre compte">S'inscrire</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

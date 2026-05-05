@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Accueil - LITReview{% endblock %}
+{% block page_label %}Page d'accueil{% endblock %}
+
+{% block content %}
+<div class="home-container">
+    <div class="signup-section">
+        <h2>Inscrivez-vous maintenant</h2>
+        <a href="{% url 'signup' %}" class="btn" aria-label="Aller à la page d'inscription">S'inscrire</a>
+    </div>
+
+    <div class="login-section">
+        <h2>Connectez-vous</h2>
+        
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+                <div class="errorlist">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <div class="form-group">
+                <label for="{{ form.username.id_for_label }}" class="visually-hidden">Nom d'utilisateur</label>
+                <input type="text" name="{{ form.username.html_name }}" id="{{ form.username.id_for_label }}" class="form-control" placeholder="Nom d'utilisateur" required aria-required="true">
+                {{ form.username.errors }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.password.id_for_label }}" class="visually-hidden">Mot de passe</label>
+                <input type="password" name="{{ form.password.html_name }}" id="{{ form.password.id_for_label }}" class="form-control" placeholder="Mot de passe" required aria-required="true">
+                {{ form.password.errors }}
+            </div>
+
+            <div class="login-form-actions">
+                <button type="submit" class="btn" aria-label="Se connecter à votre compte">Se connecter</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
