@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Modifier votre critique | LITReview{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2 class="form-title">Modifier votre critique</h2>
+    
+    <div class="ticket-preview-box">
+        <p style="font-weight: bold; margin-top: 0; margin-bottom: 1rem;">Ticket associé :</p>
+        <div class="ticket-preview-content">
+            <div class="ticket-preview-header">
+                <span>{{ ticket.user.username }} a demandé une critique</span>
+                <span>{{ ticket.time_created|date:"H:i, d F Y" }}</span>
+            </div>
+            <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+                {% if ticket.image %}
+                    <img src="{{ ticket.image.url }}" alt="Image de couverture de {{ ticket.title }}" class="ticket-preview-image">
+                {% endif %}
+                <div style="flex: 1; min-width: 200px;">
+                    <h4 style="margin: 0 0 0.5rem 0; font-size: 1.1rem; font-weight: bold;">{{ ticket.title }}</h4>
+                    <p style="margin: 0; white-space: pre-wrap;">{{ ticket.description }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        {% if form.errors %}
+            <ul class="errorlist">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <li><strong>{{ field.label }} :</strong> {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <!-- Section Critique -->
+        <div class="form-section-box">
+            <h3>Critique</h3>
+            
+            <div class="form-field">
+                <label for="id_headline">Titre</label>
+                {{ form.headline }}
+            </div>
+
+            <div class="form-field">
+                <span style="display: block; font-weight: bold; margin-bottom: 0.5rem;">Note</span>
+                {{ form.rating }}
+            </div>
+
+            <div class="form-field">
+                <label for="id_body">Commentaire</label>
+                {{ form.body }}
+            </div>
+        </div>
+
+        <div class="form-actions-right">
+            <button type="submit" class="btn">Envoyer</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

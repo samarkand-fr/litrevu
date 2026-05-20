@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} | LITReview{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2 class="form-title">{{ title }}</h2>
+    
+    <form method="post" enctype="multipart/form-data" class="form-section-box">
+        {% csrf_token %}
+        
+        {% if form.errors %}
+            <ul class="errorlist">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <li><strong>{{ field.label }} :</strong> {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <div class="form-field">
+            <label for="id_title">Titre</label>
+            {{ form.title }}
+        </div>
+
+        <div class="form-field">
+            <label for="id_description">Description</label>
+            {{ form.description }}
+        </div>
+
+        <div class="form-field">
+            <span style="display: block; font-weight: bold; margin-bottom: 0.5rem;">Image</span>
+            {% if form.instance.image %}
+                <div style="margin-bottom: 1rem;">
+                    <img src="{{ form.instance.image.url }}" alt="Image actuelle" style="max-width: 200px; display: block; border: 1px solid #ccc; margin-bottom: 1rem;">
+                </div>
+            {% endif %}
+            <div class="file-upload-wrapper">
+                <label for="id_image" class="btn" style="display: inline-block;">Télécharger fichier</label>
+                <input type="file" name="image" id="id_image" class="visually-hidden" accept="image/*">
+            </div>
+        </div>
+
+        <div class="form-actions-right">
+            <button type="submit" class="btn">Envoyer</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

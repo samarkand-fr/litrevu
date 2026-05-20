@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Flux | LITReview{% endblock %}
+
+{% block content %}
+<div class="feed-container">
+    <!-- Action buttons at the top -->
+    <div class="feed-actions-container">
+        <a href="{% url 'ticket_create' %}" class="btn feed-action-btn">Demander une critique</a>
+        <a href="{% url 'review_create' %}" class="btn feed-action-btn">Créer une critique</a>
+    </div>
+
+    <!-- Feed list of posts -->
+    <div class="feed-posts-list">
+        {% for post in posts %}
+            {% if post.type == 'review' %}
+                <!-- Card for a Review -->
+                <div class="post-card">
+                    <div class="post-header">
+                        <span>
+                            {% if post.instance.user == user %}
+                                Vous avez publié une critique
+                            {% else %}
+                                {{ post.instance.user.username }} a publié une critique
+                            {% endif %}
+                        </span>
+                        <span>{{ post.time_created|date:"H:i, d F Y" }}</span>
+                    </div>
+                    
+                    <div class="post-content">
+                        <h3 class="post-headline">
+                            {{ post.instance.headline }} - 
+                            <span class="rating-stars">
+                                {% if post.instance.rating == 5 %}
+                                    ★★★★★
+                                {% elif post.instance.rating == 4 %}
+                                    ★★★★☆
+                                {% elif post.instance.rating == 3 %}
+                                    ★★★☆☆
+                                {% elif post.instance.rating == 2 %}
+                                    ★★☆☆☆
+                                {% elif post.instance.rating == 1 %}
+                                    ★☆☆☆☆
+                                {% else %}
+                                    ☆☆☆☆☆
+                                {% endif %}
+                            </span>
+                        </h3>
+                        <p class="post-body">{{ post.instance.body }}</p>
+
+                        <!-- Nested Ticket -->
+                        <div class="inner-ticket-box">
+                            <div class="post-header" style="border-bottom: 1px solid #ccc; padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
+                                <span>Ticket - {% if post.instance.ticket.user == user %}Vous{% else %}{{ post.instance.ticket.user.username }}{% endif %}</span>
+                            </div>
+                            <div class="ticket-flex-content">
+                                {% if post.instance.ticket.image %}
+                                    <img src="{{ post.instance.ticket.image.url }}" alt="Couverture de {{ post.instance.ticket.title }}" class="ticket-preview-image" style="max-width: 120px;">
+                                {% endif %}
+                                <div class="ticket-text">
+                                    <h4 class="ticket-title-text">{{ post.instance.ticket.title }}</h4>
+                                    <p class="ticket-desc-text">{{ post.instance.ticket.description }}</p>
+                                </div>
+                            </div>
+
+                            <!-- "Créer une critique" button inside nested ticket if user hasn't reviewed it -->
+                            {% if not post.has_user_review %}
+                                <div class="post-actions-right" style="margin-top: 1rem;">
+                                    <a href="{% url 'review_create_response' post.instance.ticket.id %}" class="btn">Créer une critique</a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <!-- Card for a Ticket -->
+                <div class="post-card">
+                    <div class="post-header">
+                        <span>
+                            {% if post.instance.user == user %}
+                                Vous avez demandé une critique
+                            {% else %}
+                                {{ post.instance.user.username }} a demandé une critique
+                            {% endif %}
+                        </span>
+                        <span>{{ post.time_created|date:"H:i, d F Y" }}</span>
+                    </div>
+
+                    <div class="post-content">
+                        <h3 class="post-headline">{{ post.instance.title }}</h3>
+                        <p class="post-body">{{ post.instance.description }}</p>
+
+                        {% if post.instance.image %}
+                            <div style="margin-bottom: 1rem;">
+                                <img src="{{ post.instance.image.url }}" alt="Couverture de {{ post.instance.title }}" class="ticket-preview-image" style="max-width: 150px; display: block; border: 1px solid #ccc;">
+                            </div>
+                        {% endif %}
+
+                        <!-- "Créer une critique" button for standalone ticket if user hasn't reviewed it -->
+                        {% if not post.has_user_review %}
+                            <div class="post-actions-right">
+                                <a href="{% url 'review_create_response' post.instance.id %}" class="btn">Créer une critique</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        {% empty %}
+            <p style="text-align: center; font-size: 1.1rem; color: #666; margin-top: 3rem;">Votre flux est vide pour le moment.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

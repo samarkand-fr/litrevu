@@ -9,16 +9,20 @@
 </head>
 <body>
     <header>
-        <div class="brand">LITReview</div>
-        {% if user.is_authenticated %}
-        <nav aria-label="Navigation principale" style="margin-top: 1rem;">
-            <a href="{% url 'home' %}" style="margin-right: 1rem; color: black; text-decoration: none;">Accueil</a>
-            <form method="post" action="{% url 'logout' %}" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" style="border:none; background:none; color:black; text-decoration:underline; font-size:1rem; cursor:pointer;">Se déconnecter</button>
-            </form>
-        </nav>
-        {% endif %}
+        <div class="header-container">
+            <h1 class="brand">LITReview</h1>
+            {% if user.is_authenticated %}
+            <nav aria-label="Navigation principale" class="nav-menu">
+                <a href="{% url 'home' %}">Flux</a>
+                <a href="{% url 'posts_list' %}">Posts</a>
+                <a href="#">Abonnements</a>
+                <form method="post" action="{% url 'logout' %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="logout-btn">Se déconnecter</button>
+                </form>
+            </nav>
+            {% endif %}
+        </div>
     </header>
 
     <main id="main-content">
