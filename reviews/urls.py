@@ -5,7 +5,7 @@ urlpatterns = [
     path('ticket/add/', views.ticket_create, name='ticket_create'),
     path('ticket/<int:ticket_id>/modifier/', views.ticket_update, name='ticket_update'),
     path('ticket/<int:ticket_id>/supprimer/', views.ticket_delete, name='ticket_delete'),
-    
+
     path('review/add/', views.review_create_standalone, name='review_create'),
     path('ticket/<int:ticket_id>/review/add/', views.review_create_response, name='review_create_response'),
     path('review/<int:review_id>/modifier/', views.review_update, name='review_update'),

@@ -1,6 +1,7 @@
 from django import forms
 from .models import Ticket, Review
 
+
 class TicketForm(forms.ModelForm):
     class Meta:
         model = Ticket
@@ -15,6 +16,7 @@ class TicketForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'id': 'id_description'}),
             'image': forms.FileInput(attrs={'class': 'form-control', 'id': 'id_image'}),
         }
+
 
 class ReviewForm(forms.ModelForm):
     rating = forms.TypedChoiceField(
