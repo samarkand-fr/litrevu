@@ -15,7 +15,7 @@
             <nav aria-label="Navigation principale" class="nav-menu">
                 <a href="{% url 'home' %}">Flux</a>
                 <a href="{% url 'posts_list' %}">Posts</a>
-                <a href="#">Abonnements</a>
+                <a href="{% url 'abonnements' %}">Abonnements</a>
                 <form method="post" action="{% url 'logout' %}" style="display:inline;">
                     {% csrf_token %}
                     <button type="submit" class="logout-btn">Se déconnecter</button>

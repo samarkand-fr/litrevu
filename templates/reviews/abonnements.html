@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Abonnements | LITReview{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    {% if messages %}
+        <div class="messages" style="margin-bottom: 2rem;">
+            {% for message in messages %}
+                <div class="message {{ message.tags }}" style="padding: 1rem; border-radius: 4px; border: 1px solid {% if message.tags == 'error' %}#ff4d4d; background-color: #ffe6e6; color: #ff4d4d;{% else %}#2ecc71; background-color: #e8f8f0; color: #2ecc71;{% endif %} text-align: center; font-size: 1.05rem;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <h2 class="form-title" style="margin-bottom: 1.5rem;">Suivre d'autres utilisateurs</h2>
+    
+    <div class="form-section-box" style="padding: 2rem;">
+        <form method="post" style="display: flex; gap: 1.5rem; align-items: center; justify-content: center; flex-wrap: wrap;">
+            {% csrf_token %}
+            <div style="flex: 1; min-width: 250px;">
+                {{ form.username }}
+            </div>
+            <button type="submit" class="btn" style="padding: 0.75rem 2.5rem; font-size: 1rem; font-weight: bold;">Envoyer</button>
+        </form>
+    </div>
+
+    <h2 class="form-title" style="margin-top: 3.5rem; margin-bottom: 1.5rem;">Abonnements</h2>
+    <div class="form-section-box" style="padding: 1.5rem 2rem;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                    <th style="padding: 1rem 0; font-weight: bold; font-size: 1.1rem; color: #333;">Nom d'utilisateur</th>
+                    <th style="padding: 1rem 0; text-align: right; font-weight: bold; font-size: 1.1rem; color: #333;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for follow in following %}
+                    <tr style="border-bottom: 1px solid #eaeaea;">
+                        <td style="padding: 1.2rem 0; font-size: 1.05rem; font-weight: 500;">{{ follow.followed_user.username }}</td>
+                        <td style="padding: 1.2rem 0; text-align: right;">
+                            <a href="{% url 'abonnement_delete' follow.id %}" class="btn btn-danger" style="padding: 0.5rem 1.5rem; font-size: 0.95rem;">Désabonner</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="2" style="padding: 2.5rem 0; text-align: center; color: #777; font-style: italic; font-size: 1rem;">Vous ne suivez aucun utilisateur.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <h2 class="form-title" style="margin-top: 3.5rem; margin-bottom: 1.5rem;">Abonnés</h2>
+    <div class="form-section-box" style="padding: 1.5rem 2rem;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                    <th style="padding: 1rem 0; font-weight: bold; font-size: 1.1rem; color: #333;">Nom d'utilisateur</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for follower in followers %}
+                    <tr style="border-bottom: 1px solid #eaeaea;">
+                        <td style="padding: 1.2rem 0; font-size: 1.05rem; font-weight: 500;">{{ follower.user.username }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td style="padding: 2.5rem 0; text-align: center; color: #777; font-style: italic; font-size: 1rem;">Aucun utilisateur ne vous suit pour le moment.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

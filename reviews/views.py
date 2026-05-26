@@ -1,10 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.contrib import messages
 from django.db import models
 from .models import Ticket, Review, UserFollows
-from .forms import TicketForm, ReviewForm
+from .forms import TicketForm, ReviewForm, FollowUserForm
+
+User = get_user_model()
 
 
 @login_required
@@ -197,3 +200,49 @@ def feed(request):
     posts.sort(key=lambda x: x['time_created'], reverse=True)
 
     return render(request, 'reviews/feed.html', {'posts': posts})
+
+
+@login_required
+def abonnements(request):
+    if request.method == 'POST':
+        form = FollowUserForm(request.POST)
+        if form.is_valid():
+            username_to_follow = form.cleaned_data['username']
+            try:
+                user_to_follow = User.objects.get(username=username_to_follow)
+                if user_to_follow == request.user:
+                    messages.error(request, "Vous ne pouvez pas vous abonner à vous-même.")
+                elif UserFollows.objects.filter(user=request.user, followed_user=user_to_follow).exists():
+                    messages.error(request, f"Vous suivez déjà {username_to_follow}.")
+                else:
+                    UserFollows.objects.create(user=request.user, followed_user=user_to_follow)
+                    messages.success(request, f"Vous êtes maintenant abonné à {username_to_follow}.")
+                    return redirect('abonnements')
+            except User.DoesNotExist:
+                messages.error(request, "Cet utilisateur n'existe pas.")
+    else:
+        form = FollowUserForm()
+
+    following = UserFollows.objects.filter(user=request.user)
+    followers = UserFollows.objects.filter(followed_user=request.user)
+
+    return render(request, 'reviews/abonnements.html', {
+        'form': form,
+        'following': following,
+        'followers': followers,
+    })
+
+
+@login_required
+def abonnement_delete(request, follow_id):
+    follow = get_object_or_404(UserFollows, id=follow_id, user=request.user)
+    followed_username = follow.followed_user.username
+    if request.method == 'POST':
+        follow.delete()
+        messages.success(request, f"Vous ne suivez plus {followed_username}.")
+        return redirect('abonnements')
+
+    return render(request, 'reviews/confirm_delete.html', {
+        'object_name': f"l'abonnement à {followed_username}",
+        'cancel_url': 'abonnements'
+    })

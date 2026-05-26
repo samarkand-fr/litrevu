@@ -12,4 +12,6 @@ urlpatterns = [
     path('review/<int:review_id>/supprimer/', views.review_delete, name='review_delete'),
     path('posts/', views.posts_list, name='posts_list'),
     path('home/', views.feed, name='home'),
+    path('abonnements/', views.abonnements, name='abonnements'),
+    path('abonnements/<int:follow_id>/supprimer/', views.abonnement_delete, name='abonnement_delete'),
 ]

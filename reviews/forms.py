@@ -37,3 +37,15 @@ class ReviewForm(forms.ModelForm):
             'headline': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_headline'}),
             'body': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'id': 'id_body'}),
         }
+
+
+class FollowUserForm(forms.Form):
+    username = forms.CharField(
+        label="Nom d'utilisateur",
+        max_length=150,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': "Nom d'utilisateur",
+            'id': 'id_username'
+        })
+    )
