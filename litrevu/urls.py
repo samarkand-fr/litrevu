@@ -7,20 +7,23 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('reviews.urls')),
-    path('', LoginView.as_view(
-        template_name='authentication/login.html',
-        redirect_authenticated_user=True
-    ), name='login'),
+
+    # Auth
     path('login/', LoginView.as_view(
         template_name='authentication/login.html',
         redirect_authenticated_user=True
     ), name='login'),
+
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
+
     path('signup/', views.signup_page, name='signup'),
+
+    # App principale (feed, etc.)
+    path('', include('reviews.urls')),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(
-        settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
+        settings.MEDIA_URL,
+        document_root=settings.MEDIA_ROOT
     )
