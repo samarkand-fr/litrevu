@@ -11,6 +11,8 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'litrevu.settings')
+# Tell Django which settings file to use for this project
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "litrevu.settings")
 
 application = get_asgi_application()

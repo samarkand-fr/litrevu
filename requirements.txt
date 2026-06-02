@@ -2,3 +2,7 @@ asgiref==3.11.1
 Django==6.0.4
 sqlparse==0.5.5
 Pillow
+python-dotenv==1.2.2
+black==26.5.1
+flake8==7.3.0
+

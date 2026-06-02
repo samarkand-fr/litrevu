@@ -101,8 +101,9 @@ Follow the on-screen instructions to set a username, email address, and password
 
 ## Code Quality Check
 
-The project is fully compliant with the PEP8 style guide. To check compliance, run:
+The project follows PEP8 style guidelines and uses **Black** for automatic code formatting. To check code quality and format, run:
 
 ```bash
 flake8 reviews/ authentication/
+black .
 ```
