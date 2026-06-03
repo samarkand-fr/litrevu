@@ -1,21 +1,29 @@
+<!-- base.html — Master layout template that all pages inherit from.
+     Defines the global HTML structure, header with navigation, and
+     the main content block that child templates override. -->
 {% load static %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Page title: child templates can override via {% block title %} -->
     <title>{% block title %}LITReview{% endblock %}</title>
+    <!-- Single stylesheet loaded globally for the entire application -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
+    <!-- Site header: brand logo + navigation bar -->
     <header>
         <div class="header-container">
             <h1 class="brand">LITReview</h1>
+            <!-- Navigation is only shown to authenticated users -->
             {% if user.is_authenticated %}
             <nav aria-label="Navigation principale" class="nav-menu">
                 <a href="{% url 'home' %}">Flux</a>
                 <a href="{% url 'posts_list' %}">Posts</a>
                 <a href="{% url 'abonnements' %}">Abonnements</a>
+                <!-- Logout uses POST to prevent CSRF attacks (not a simple link) -->
                 <form method="post" action="{% url 'logout' %}" style="display:inline;">
                     {% csrf_token %}
                     <button type="submit" class="logout-btn">Se déconnecter</button>
@@ -25,6 +33,7 @@
         </div>
     </header>
 
+    <!-- Main content area — each child template fills this block -->
     <main id="main-content">
         {% block content %}
         {% endblock %}
