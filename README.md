@@ -66,7 +66,23 @@ python3 -m venv env
 pip install -r requirements.txt
 ```
 
-### Step 5: Run migrations and initialize the database
+### Step 5: Configure Environment Variables
+
+The project requires environment variables to run. A template file `.env.template` is provided. Copy it to a new `.env` file:
+
+* **On macOS / Linux**:
+
+  ```bash
+  cp .env.template .env
+  ```
+  
+* **On Windows**:
+
+  ```cmd
+  copy .env.template .env
+  ```
+
+### Step 6: Run migrations and initialize the database
 
 The application uses a local **SQLite** database.
 Apply the migrations to initialize the database schema:
@@ -75,7 +91,7 @@ Apply the migrations to initialize the database schema:
 python manage.py migrate
 ```
 
-### Step 6: Start the development server
+### Step 7: Start the development server
 
 ```bash
 python manage.py runserver
