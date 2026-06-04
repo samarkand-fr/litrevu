@@ -1,4 +1,9 @@
 {% extends 'base.html' %}
+{% comment %}
+ticket_form.html — Reusable form for creating or editing a ticket.
+The title is dynamic depending on whether it's create or edit mode.
+Extends base.html for the global layout.
+{% endcomment %}
 
 {% block title %}{{ title }} | LITReview{% endblock %}
 
@@ -6,9 +11,11 @@
 <div class="form-container">
     <h2 class="form-title">{{ title }}</h2>
     
+    {# Form uses multipart/form-data encoding to support image file uploads #}
     <form method="post" enctype="multipart/form-data" class="form-section-box">
         {% csrf_token %}
         
+        {# Display form validation errors loop #}
         {% if form.errors %}
             <ul class="errorlist">
                 {% for field in form %}
@@ -29,6 +36,7 @@
             {{ form.description }}
         </div>
 
+        {# Image field section: displays existing image preview if editing #}
         <div class="form-field">
             <span style="display: block; font-weight: bold; margin-bottom: 0.5rem;">Image</span>
             {% if form.instance.image %}
@@ -37,6 +45,7 @@
                 </div>
             {% endif %}
             <div class="file-upload-wrapper">
+                {# Visually-hidden file input with a styled label acting as the upload button #}
                 <label for="id_image" class="btn" style="display: inline-block;">Télécharger fichier</label>
                 <input type="file" name="image" id="id_image" class="visually-hidden" accept="image/*">
             </div>

@@ -1,4 +1,9 @@
 {% extends 'base.html' %}
+{% comment %}
+review_form.html — Form for editing an existing review.
+Displays the associated ticket as a read-only preview above the form.
+Extends base.html for the global layout.
+{% endcomment %}
 
 {% block title %}Modifier votre critique | LITReview{% endblock %}
 
@@ -6,6 +11,7 @@
 <div class="form-container">
     <h2 class="form-title">Modifier votre critique</h2>
     
+    {# Ticket preview box: read-only context showing what ticket this review belongs to #}
     <div class="ticket-preview-box">
         <p style="font-weight: bold; margin-top: 0; margin-bottom: 1rem;">Ticket associé :</p>
         <div class="ticket-preview-content">
@@ -38,7 +44,7 @@
             </ul>
         {% endif %}
 
-        <!-- Section Critique -->
+        {# Section Critique: Review form fields (headline, rating, body) #}
         <div class="form-section-box">
             <h3>Critique</h3>
             
@@ -47,6 +53,7 @@
                 {{ form.headline }}
             </div>
 
+            {# Rating radio buttons (0-5 scale) #}
             <div class="form-field">
                 <span style="display: block; font-weight: bold; margin-bottom: 0.5rem;">Note</span>
                 {{ form.rating }}

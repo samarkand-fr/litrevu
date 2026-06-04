@@ -1,4 +1,9 @@
 {% extends 'base.html' %}
+{% comment %}
+review_standalone_form.html — Combined form for creating both a ticket and a review in a single submission.
+Contains fields for both models.
+Extends base.html for the global layout.
+{% endcomment %}
 
 {% block title %}Créer une critique | LITReview{% endblock %}
 
@@ -6,9 +11,11 @@
 <div class="form-container">
     <h2 class="form-title">Créer une critique</h2>
     
+    {# Form uses multipart/form-data encoding since it includes ticket image upload #}
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         
+        {# Combined error display loop for both ticket_form and review_form #}
         {% if ticket_form.errors or review_form.errors %}
             <ul class="errorlist">
                 {% for field in ticket_form %}
@@ -24,7 +31,7 @@
             </ul>
         {% endif %}
 
-        <!-- Section 1 : Livre / Article -->
+        {# Section 1 : Book / Article ticket fields #}
         <div class="form-section-box">
             <h3>Livre / Article</h3>
             
@@ -47,7 +54,7 @@
             </div>
         </div>
 
-        <!-- Section 2 : Critique -->
+        {# Section 2 : Review fields #}
         <div class="form-section-box">
             <h3>Critique</h3>
             

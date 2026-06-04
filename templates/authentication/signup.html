@@ -1,37 +1,41 @@
-<!-- signup.html — User registration page.
-     Renders a dynamic form loop for all signup fields (username, password, confirm).
-     Extends base.html for the global layout. -->
 {% extends 'base.html' %}
+{% comment %}
+signup.html — User registration page.
+Renders a dynamic form loop for all signup fields (username, password, confirm).
+Extends base.html for the global layout.
+{% endcomment %}
 
 {% block title %}Inscription - LITReview{% endblock %}
 {% block page_label %}Formulaire d'inscription{% endblock %}
 
 {% block content %}
-<!-- Centered card container for the signup form -->
+{# Centered card container for the signup form #}
 <div class="signup-form-container">
     <h2>Inscrivez-vous</h2>
     
     <form method="post" action="{% url 'signup' %}">
         {% csrf_token %}
         
-        <!-- Display non-field errors (e.g., password mismatch) -->
+        {# Display non-field errors (e.g., password mismatch) #}
         {% if form.non_field_errors %}
             <div class="errorlist">{{ form.non_field_errors }}</div>
         {% endif %}
 
-        <!-- Dynamic loop: iterates over all form fields from SignupForm.
-             Placeholders are set conditionally based on field name to provide
-             user-friendly hints without showing the technical field names. -->
+        {% comment %}
+        Dynamic loop: iterates over all form fields from SignupForm.
+        Placeholders are set conditionally based on field name to provide
+        user-friendly hints without showing the technical field names.
+        {% endcomment %}
         {% for field in form %}
             <div class="form-group">
-                <!-- Labels are visually hidden but remain accessible to screen readers (WCAG) -->
+                {# Labels are visually hidden but remain accessible to screen readers (WCAG) #}
                 <label for="{{ field.id_for_label }}" class="visually-hidden">{{ field.label }}</label>
                 <input type="{{ field.field.widget.input_type }}" name="{{ field.html_name }}" id="{{ field.id_for_label }}" class="form-control" placeholder="{% if field.name == 'username' %}Nom d'utilisateur{% elif field.name == 'password' or field.name == 'password_1' or field.name == 'password_2' %}Mot de passe{% elif 'confirm' in field.label|lower or 'confirmation' in field.label|lower %}Confirmer mod de passe{% else %}{{ field.label }}{% endif %}" required aria-required="true">
                 {{ field.errors }}
             </div>
         {% endfor %}
 
-        <!-- Form actions: "back to login" link + submit button, right-aligned -->
+        {# Form actions: "back to login" link + submit button, right-aligned #}
         <div class="signup-form-actions">
             <a href="{% url 'login' %}" class="btn" aria-label="Retourner à la page de connexion">Retourner</a>
             <button type="submit" class="btn" aria-label="Créer votre compte">S'inscrire</button>

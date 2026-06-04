@@ -1,28 +1,30 @@
-<!-- feed.html — Main activity feed page.
-     Displays a reverse-chronological list of tickets and reviews from:
-     - The logged-in user
-     - Users they follow
-     - Reviews written in response to the user's own tickets
-     Extends base.html for the global layout. -->
 {% extends 'base.html' %}
+{% comment %}
+feed.html — Main activity feed page.
+Displays a reverse-chronological list of tickets and reviews from:
+- The logged-in user
+- Users they follow
+- Reviews written in response to the user's own tickets
+Extends base.html for the global layout.
+{% endcomment %}
 
 {% block title %}Flux | LITReview{% endblock %}
 
 {% block content %}
 <div class="feed-container">
-    <!-- Top action buttons: create a new ticket or write a standalone review -->
+    {# Top action buttons: create a new ticket or write a standalone review #}
     <div class="feed-actions-container">
         <a href="{% url 'ticket_create' %}" class="btn feed-action-btn">Demander une critique</a>
         <a href="{% url 'review_create' %}" class="btn feed-action-btn">Créer une critique</a>
     </div>
 
-    <!-- Feed list: iterates over combined tickets + reviews sorted by time_created -->
+    {# Feed list: iterates over combined tickets + reviews sorted by time_created #}
     <div class="feed-posts-list">
         {% for post in posts %}
             {% if post.type == 'review' %}
-                <!-- ========== REVIEW CARD ========== -->
+                {# ========== REVIEW CARD ========== #}
                 <div class="post-card">
-                    <!-- Card header: shows who published the review and when -->
+                    {# Card header: shows who published the review and when #}
                     <div class="post-header">
                         <span>
                             {% if post.instance.user == user %}
@@ -35,7 +37,7 @@
                     </div>
                     
                     <div class="post-content">
-                        <!-- Review headline + star rating (0-5 scale displayed as Unicode stars) -->
+                        {# Review headline + star rating (0-5 scale displayed as Unicode stars) #}
                         <h3 class="post-headline">
                             {{ post.instance.headline }} - 
                             <span class="rating-stars">
@@ -56,7 +58,7 @@
                         </h3>
                         <p class="post-body">{{ post.instance.body }}</p>
 
-                        <!-- Nested ticket: shows the parent ticket this review is responding to -->
+                        {# Nested ticket: shows the parent ticket this review is responding to #}
                         <div class="inner-ticket-box">
                             <div class="post-header" style="border-bottom: 1px solid #ccc; padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
                                 <span>Ticket - {% if post.instance.ticket.user == user %}Vous{% else %}{{ post.instance.ticket.user.username }}{% endif %}</span>
@@ -71,8 +73,10 @@
                                 </div>
                             </div>
 
-                            <!-- "Create review" button only appears if the current user
-                                 has not already posted a review for this ticket -->
+                            {% comment %}
+                            "Create review" button only appears if the current user
+                            has not already posted a review for this ticket
+                            {% endcomment %}
                             {% if not post.has_user_review %}
                                 <div class="post-actions-right" style="margin-top: 1rem;">
                                     <a href="{% url 'review_create_response' post.instance.ticket.id %}" class="btn">Créer une critique</a>
@@ -82,9 +86,9 @@
                     </div>
                 </div>
             {% else %}
-                <!-- ========== TICKET CARD ========== -->
+                {# ========== TICKET CARD ========== #}
                 <div class="post-card">
-                    <!-- Card header: shows who requested the review and when -->
+                    {# Card header: shows who requested the review and when #}
                     <div class="post-header">
                         <span>
                             {% if post.instance.user == user %}
@@ -100,14 +104,14 @@
                         <h3 class="post-headline">{{ post.instance.title }}</h3>
                         <p class="post-body">{{ post.instance.description }}</p>
 
-                        <!-- Optional cover image for the ticket -->
+                        {# Optional cover image for the ticket #}
                         {% if post.instance.image %}
                             <div style="margin-bottom: 1rem;">
                                 <img src="{{ post.instance.image.url }}" alt="Couverture de {{ post.instance.title }}" class="ticket-preview-image" style="max-width: 150px; display: block; border: 1px solid #ccc;">
                             </div>
                         {% endif %}
 
-                        <!-- "Create review" button: only shown if user hasn't already reviewed this ticket -->
+                        {# "Create review" button: only shown if user hasn't already reviewed this ticket #}
                         {% if not post.has_user_review %}
                             <div class="post-actions-right">
                                 <a href="{% url 'review_create_response' post.instance.id %}" class="btn">Créer une critique</a>
@@ -116,7 +120,7 @@
                     </div>
                 </div>
             {% endif %}
-        <!-- Empty state: displayed when the feed has no posts -->
+        {# Empty state: displayed when the feed has no posts #}
         {% empty %}
             <p style="text-align: center; font-size: 1.1rem; color: #666; margin-top: 3rem;">Votre flux est vide pour le moment.</p>
         {% endfor %}

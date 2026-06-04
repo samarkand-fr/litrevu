@@ -1,3 +1,6 @@
+/* Main stylesheet for LITReview.
+   Uses CSS custom properties for theming and Flexbox for all layouts. */
+
 :root {
   --color-background: #ffffff;
   --color-text: #000000;
@@ -149,6 +152,8 @@ main {
 }
 
 /* Utils */
+/* .visually-hidden: WCAG accessibility pattern.
+   Hides content visually on screen while keeping it available for screen readers. */
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -223,7 +228,9 @@ form p {
   text-align: left;
 }
 
-/* Radio select styling for ratings */
+/* Radio select styling for ratings.
+   Django renders radio buttons as an unordered list by default.
+   important is used here to override those defaults and enforce a horizontal flex layout. */
 #id_rating,
 .rating-radio-input {
   display: flex !important;
@@ -356,7 +363,8 @@ form p {
   margin: 0 0 1.5rem 0;
 }
 
-/* Inner Ticket (nested in Review card) */
+/* Inner Ticket (nested in Review card).
+   Displays the parent ticket that the review is written in response to. */
 .inner-ticket-box {
   border: 1px solid #000000;
   padding: 1.5rem;
@@ -394,6 +402,7 @@ form p {
   align-items: center;
 }
 
+/* .btn-danger: used specifically for destructive actions like delete buttons. */
 .btn-danger {
   background-color: #ffffff;
   border: 1px solid #ff4d4d;
@@ -404,5 +413,3 @@ form p {
 .btn-danger:focus {
   background-color: #ffe6e6;
 }
-
-

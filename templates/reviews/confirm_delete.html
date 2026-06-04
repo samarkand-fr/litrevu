@@ -1,4 +1,9 @@
 {% extends 'base.html' %}
+{% comment %}
+confirm_delete.html — Generic reusable deletion confirmation page.
+Used for tickets, reviews, and subscriptions.
+Extends base.html for the global layout.
+{% endcomment %}
 
 {% block title %}Confirmer la suppression | LITReview{% endblock %}
 
@@ -6,11 +11,13 @@
 <div class="form-container">
     <div class="form-section-box">
         <h2 class="form-title" style="margin-top: 0; font-size: 1.5rem;">Confirmer la suppression</h2>
+        {# Dynamic object_name display to show what is being deleted #}
         <p style="font-size: 1.1rem; text-align: center; margin-bottom: 2rem;">
             Êtes-vous sûr de vouloir supprimer {{ object_name }} ? Cette action est définitive.
         </p>
         <form method="post" style="text-align: center;">
             {% csrf_token %}
+            {# Confirm submits POST to perform deletion, cancel navigates back to cancel_url #}
             <button type="submit" class="btn" style="background-color: #ff4d4d; color: white; border: none; margin-right: 1rem;">Confirmer la suppression</button>
             <a href="{% url cancel_url %}" class="btn">Annuler</a>
         </form>

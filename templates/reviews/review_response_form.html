@@ -1,4 +1,9 @@
 {% extends 'base.html' %}
+{% comment %}
+review_response_form.html — Form for creating a review in response to an existing ticket.
+Displays the target ticket as a read-only preview.
+Extends base.html for the global layout.
+{% endcomment %}
 
 {% block title %}Créer une critique en réponse | LITReview{% endblock %}
 
@@ -6,6 +11,7 @@
 <div class="form-container">
     <h2 class="form-title">Créer une critique</h2>
     
+    {# Ticket preview box: shows the specific ticket the user is responding to #}
     <div class="ticket-preview-box">
         <p style="font-weight: bold; margin-top: 0; margin-bottom: 1rem;">Vous êtes en train de poster en réponse à :</p>
         <div class="ticket-preview-content">
@@ -38,7 +44,7 @@
             </ul>
         {% endif %}
 
-        <!-- Section Critique -->
+        {# Section Critique: Review form fields for the response #}
         <div class="form-section-box">
             <h3>Critique</h3>
             
