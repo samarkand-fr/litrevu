@@ -15,6 +15,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from .forms import FollowUserForm, ReviewForm, TicketForm
 from .models import Review, Ticket, UserFollows
 
+# Fetch the active user model for the project
 User = get_user_model()
 
 
@@ -26,14 +27,18 @@ def ticket_create(request):
     logged-in user, saves the Ticket, and redirects to the feed.
     """
     if request.method == "POST":
+        # Bind the form with submitted POST data and files (like images)
         form = TicketForm(request.POST, request.FILES)
         if form.is_valid():
+            # commit=False prevents immediate saving to the database
+            # so we can assign the logged-in user first
             ticket = form.save(commit=False)
             ticket.user = request.user
             ticket.save()
             messages.success(request, "Le ticket a été créé avec succès.")
             return redirect("home")
     else:
+        # Empty form for a GET request to render the creation page
         form = TicketForm()
     return render(
         request,
@@ -49,17 +54,21 @@ def ticket_update(request, ticket_id):
     Ensures the logged-in user is the author of the Ticket.
     Saves modifications and redirects to the user's posts list.
     """
+    # Fetch the ticket or raise a 404 error if not found
     ticket = get_object_or_404(Ticket, id=ticket_id)
+    # Security: Verify that the logged-in user is the actual author of the ticket
     if ticket.user != request.user:
         raise PermissionDenied("Vous n'êtes pas autorisé à modifier ce ticket.")
 
     if request.method == "POST":
+        # Pass the existing instance to update it instead of creating a new database row
         form = TicketForm(request.POST, request.FILES, instance=ticket)
         if form.is_valid():
             form.save()
             messages.success(request, "Le ticket a été modifié avec succès.")
             return redirect("posts_list")
     else:
+        # Pre-populate the form with the current ticket data for a GET request
         form = TicketForm(instance=ticket)
     return render(
         request,
@@ -76,14 +85,18 @@ def ticket_delete(request, ticket_id):
     Renders confirmation page for GET and performs deletion on POST.
     """
     ticket = get_object_or_404(Ticket, id=ticket_id)
+
+    # Security: Only the author can delete their own ticket
     if ticket.user != request.user:
         raise PermissionDenied("Vous n'êtes pas autorisé à supprimer ce ticket.")
 
     if request.method == "POST":
+        # Perform the actual deletion after confirmation
         ticket.delete()
         messages.success(request, "Le ticket a été supprimé.")
         return redirect("posts_list")
 
+    # For a GET request, render a deletion confirmation page
     return render(
         request,
         "reviews/confirm_delete.html",
@@ -104,12 +117,14 @@ def review_create_standalone(request):
     if request.method == "POST":
         ticket_form = TicketForm(request.POST, request.FILES)
         review_form = ReviewForm(request.POST)
+        # Validate both forms simultaneously
         if ticket_form.is_valid() and review_form.is_valid():
-            # Save ticket first to get an ID before linking it to the review
+            # 1. Save the ticket first to generate its ID in the database
             ticket = ticket_form.save(commit=False)
             ticket.user = request.user
             ticket.save()
 
+            # 2. Save the review and link it to the newly created ticket
             review = review_form.save(commit=False)
             review.ticket = ticket
             review.user = request.user
@@ -120,10 +135,14 @@ def review_create_standalone(request):
             )
             return redirect("home")
     else:
+        # Initialize two empty forms for the initial render
         ticket_form = TicketForm()
         review_form = ReviewForm()
-
-
+    return render(
+        request,
+        "reviews/review_standalone_form.html",
+        {"ticket_form": ticket_form, "review_form": review_form},
+    )
 
 
 @login_required
@@ -132,10 +151,12 @@ def review_create_response(request, ticket_id):
 
     Saves the Review, links it to the specified Ticket, and redirects to the feed.
     """
+    # Identify the ticket the user is responding to  based on the provided  ticket_id and ensure it exists, otherwise return a 404 error
     ticket = get_object_or_404(Ticket, id=ticket_id)
     if request.method == "POST":
         form = ReviewForm(request.POST)
         if form.is_valid():
+            # Link the review to the existing ticket and the logged-in user
             review = form.save(commit=False)
             review.ticket = ticket
             review.user = request.user
@@ -159,6 +180,7 @@ def review_update(request, review_id):
     Saves modifications and redirects to the user's posts list.
     """
     review = get_object_or_404(Review, id=review_id)
+    # Security: Only the review author can edit it
     if review.user != request.user:
         raise PermissionDenied("Vous n'êtes pas autorisé à modifier cette critique.")
 
@@ -185,6 +207,7 @@ def review_delete(request, review_id):
     Renders confirmation page for GET and performs deletion on POST.
     """
     review = get_object_or_404(Review, id=review_id)
+    # Security: Only the author can delete their review
     if review.user != request.user:
         raise PermissionDenied("Vous n'êtes pas autorisé à supprimer cette critique.")
 
@@ -192,7 +215,7 @@ def review_delete(request, review_id):
         review.delete()
         messages.success(request, "La critique a été supprimée.")
         return redirect("posts_list")
-
+    # Render confirmation page before deletion
     return render(
         request,
         "reviews/confirm_delete.html",
@@ -209,6 +232,7 @@ def posts_list(request):
 
     Combines them into a single sorted chronological list.
     """
+    # Separately fetch the user's tickets and reviews
     user_tickets = Ticket.objects.filter(user=request.user)
     user_reviews = Review.objects.filter(user=request.user)
 
@@ -266,8 +290,9 @@ def feed(request):
 
     posts = []
 
-    # Process tickets and check if current user has already replied to them
+    # Build the feed list and check if the user has already replied to each item
     for ticket in tickets:
+        # Check if the user already replied to this specific ticket (to show/hide the reply button)
         has_user_review = Review.objects.filter(
             ticket=ticket, user=request.user
         ).exists()
@@ -313,15 +338,18 @@ def abonnements(request):
                 user_to_follow = User.objects.get(username=username_to_follow)
 
                 # Validation checks before creating relation
+                # Business rule 1: Users cannot follow themselves
                 if user_to_follow == request.user:
                     messages.error(
                         request, "Vous ne pouvez pas vous abonner à vous-même."
                     )
+                    # Business rule 2: Prevent duplicate follow relationships
                 elif UserFollows.objects.filter(
                     user=request.user, followed_user=user_to_follow
                 ).exists():
                     messages.error(request, f"Vous suivez déjà {username_to_follow}.")
                 else:
+                    # Create the follow relationship
                     UserFollows.objects.create(
                         user=request.user, followed_user=user_to_follow
                     )
@@ -334,7 +362,7 @@ def abonnements(request):
                 messages.error(request, "Cet utilisateur n'existe pas.")
     else:
         form = FollowUserForm()
-
+    # Fetch following (users I follow) and followers (users following me)
     following = UserFollows.objects.filter(user=request.user)
     followers = UserFollows.objects.filter(followed_user=request.user)
 
@@ -355,9 +383,11 @@ def abonnement_delete(request, follow_id):
 
     Ensures the user owns the UserFollows relationship, deletes it, and redirects.
     """
+    # Fetch the specific follow relationship belonging strictly to the current user based on the provided follow_id, or return a 404 if not found
     follow = get_object_or_404(UserFollows, id=follow_id, user=request.user)
     followed_username = follow.followed_user.username
     if request.method == "POST":
+        # Delete the follow relationship
         follow.delete()
         messages.success(request, f"Vous ne suivez plus {followed_username}.")
         return redirect("abonnements")

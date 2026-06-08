@@ -6,15 +6,15 @@ from . import views
 urlpatterns = [
     # 1. Homepage: Serves the activity feed for the authenticated user
     path("", views.feed, name="home"),
-    
     # Tickets
     # Route for creating a standalone ticket
     path("ticket/add/", views.ticket_create, name="ticket_create"),
     # Route for editing an existing ticket
     path("ticket/<int:ticket_id>/modifier/", views.ticket_update, name="ticket_update"),
     # Route for deleting an existing ticket
-    path("ticket/<int:ticket_id>/supprimer/", views.ticket_delete, name="ticket_delete"),
-    
+    path(
+        "ticket/<int:ticket_id>/supprimer/", views.ticket_delete, name="ticket_delete"
+    ),
     # Reviews
     # Route for creating a combined ticket + review in one form
     path("review/add/", views.review_create_standalone, name="review_create"),
@@ -27,8 +27,9 @@ urlpatterns = [
     # Route for editing an existing review
     path("review/<int:review_id>/modifier/", views.review_update, name="review_update"),
     # Route for deleting an existing review
-    path("review/<int:review_id>/supprimer/", views.review_delete, name="review_delete"),
-    
+    path(
+        "review/<int:review_id>/supprimer/", views.review_delete, name="review_delete"
+    ),
     # My Space & Subscriptions
     # Lists only the user's own tickets and reviews (the "Vos posts" section)
     path("posts/", views.posts_list, name="posts_list"),
