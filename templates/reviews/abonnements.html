@@ -13,9 +13,15 @@ Extends base.html for the global layout.
     {% if messages %}
         <div class="messages" style="margin-bottom: 2rem;">
             {% for message in messages %}
-                <div class="message {{ message.tags }}" style="padding: 1rem; border-radius: 4px; border: 1px solid {% if message.tags == 'error' %}#ff4d4d; background-color: #ffe6e6; color: #ff4d4d;{% else %}#2ecc71; background-color: #e8f8f0; color: #2ecc71;{% endif %} text-align: center; font-size: 1.05rem;">
-                    {{ message }}
-                </div>
+                {% if message.tags == 'error' %}
+                    <div class="message error" style="padding: 1rem; border-radius: 4px; border: 1px solid #ff4d4d; background-color: #ffe6e6; color: #ff4d4d; text-align: center; font-size: 1.05rem;">
+                        {{ message }}
+                    </div>
+                {% else %}
+                    <div class="message {{ message.tags }}" style="padding: 1rem; border-radius: 4px; border: 1px solid #2ecc71; background-color: #e8f8f0; color: #2ecc71; text-align: center; font-size: 1.05rem;">
+                        {{ message }}
+                    </div>
+                {% endif %}
             {% endfor %}
         </div>
     {% endif %}

@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.db import models
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import FollowUserForm, ReviewForm, TicketForm
@@ -266,61 +266,75 @@ def posts_list(request):
 def feed(request):
     """Render the activity feed for the logged-in user.
 
-    Includes posts from followed users, from the user themselves, and reviews
+     Includes posts from followed users, from the user themselves, and reviews
     written in response to the user's tickets.
     """
-    # Get the list of IDs that the current user follows
-    followed_users = list(
-        UserFollows.objects.filter(user=request.user).values_list(
-            "followed_user", flat=True
-        )
+    # Store the currently logged-in user instance in a local variable
+    user = request.user
+
+    # 1. RETRIEVE FOLLOWED USERS
+    # Fetch only the IDs of the users the current user follows.
+    followed_users = UserFollows.objects.filter(user=user).values_list(
+        "followed_user", flat=True
     )
 
-    # Fetch tickets: belongs to user OR followed users
-    tickets = Ticket.objects.filter(
-        models.Q(user=request.user) | models.Q(user__in=followed_users)
-    ).distinct()
+    # 2. Fetch tickets and prefetch related user data for the feed,
+    # filtering for tickets by the user and followed users in one query
+    # .select_related("user") performs an SQL JOIN to prefetch author data for each ticket
+    tickets = (
+        Ticket.objects.filter(Q(user=user) | Q(user__in=followed_users))
+        .select_related("user")
+        .distinct()
+    )
 
-    # Fetch reviews: belongs to user OR followed users OR replies to user's tickets
-    reviews = Review.objects.filter(
-        models.Q(user=request.user)
-        | models.Q(user__in=followed_users)
-        | models.Q(ticket__user=request.user)
-    ).distinct()
+    # 3. FETCH REVIEWS (CRITIQUES)
+    # Fetch reviews written by the user, their follows, OR written by anyone in response to the user's tickets.
+    # .select_related prefetches the review author, the connected ticket, and the ticket's author in one shot.
+    reviews = (
+        Review.objects.filter(
+            Q(user=user) | Q(user__in=followed_users) | Q(ticket__user=user)
+        )
+        .select_related("user", "ticket", "ticket__user")
+        .distinct()
+    )
 
+    # 4.Fetch the IDs of all tickets the logged-in user has already reviewed in a SINGLE database hit.
+    reviewed_ticket_ids = set(
+        Review.objects.filter(user=user).values_list("ticket_id", flat=True)
+    )
+    # Initialize the unified list that will hold all combined feed items (Tickets + Reviews)
     posts = []
 
-    # Build the feed list and check if the user has already replied to each item
+    # 5. BUILD UNIFIED STREAM (DATA FUSION)
+    # Loop through the retrieved tickets and standardize them into clean dictionary structures
     for ticket in tickets:
-        # Check if the user already replied to this specific ticket (to show/hide the reply button)
-        has_user_review = Review.objects.filter(
-            ticket=ticket, user=request.user
-        ).exists()
         posts.append(
             {
                 "type": "ticket",
                 "instance": ticket,
                 "time_created": ticket.time_created,
-                "has_user_review": has_user_review,
+                # Ultra-fast lookup in memory using the set created in Step 4 to determine if the user has already reviewed this ticket
+                "has_user_review": ticket.id in reviewed_ticket_ids,
             }
         )
-
+    # Process and append reviews into the exact same global list
     for review in reviews:
-        has_user_review = Review.objects.filter(
-            ticket=review.ticket, user=request.user
-        ).exists()
         posts.append(
             {
                 "type": "review",
                 "instance": review,
                 "time_created": review.time_created,
-                "has_user_review": has_user_review,
+                "has_user_review": review.ticket_id in reviewed_ticket_ids,
             }
         )
 
-    # Chronological sort for the global feed (newest first)
+    # 6. GLOBAL CHRONOLOGICAL SORTING
+    # Sort the combined list of different objects based on their creation timestamp.
+    # reverse=True ensures a reverse-chronological order (newest posts appear first).
     posts.sort(key=lambda x: x["time_created"], reverse=True)
 
+    # 7. FINAL RENDERING
+    # Pass the unified, perfectly sorted feed list to the 'reviews/feed.html' template
     return render(request, "reviews/feed.html", {"posts": posts})
 
 
